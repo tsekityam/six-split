@@ -149,7 +149,9 @@ export default function App() {
       return
     }
     if (amount < HALF_UNIT) {
-      setError(`最低投注為 ${formatHkd(HALF_UNIT)}（半注單式）。`)
+      setError(
+        `最低投注為 ${formatHkd(HALF_UNIT)}（半注複式／膽拖）；單式最低 ${formatHkd(10)}。`,
+      )
       setResult(null)
       return
     }
@@ -185,7 +187,7 @@ export default function App() {
 
   const helperText =
     error ??
-    `一注 ${formatHkd(10)}、半注 ${formatHkd(HALF_UNIT)}。非 $5 倍數的餘額會保留為未投注。`
+    `單式僅一注 ${formatHkd(10)}；複式／膽拖可一注或半注 ${formatHkd(HALF_UNIT)}。非 $5 倍數餘額不投注。`
 
   return (
     <div>
@@ -201,7 +203,7 @@ export default function App() {
           Bet Slip Generator
         </h2>
         <p className="md-typescale-body-large muted" style={{ margin: '0 0 24px' }}>
-          輸入總投注額，隨機產生單式、複式、膽拖注項（一注 / 半注皆可），合計金額與輸入一致。
+          輸入總投注額，隨機產生單式（一注）、複式／膽拖（一注或半注），合計金額與輸入一致。
         </p>
 
         <ElevatedCard>

@@ -1,4 +1,7 @@
-/** HKJC Mark Six helpers: 單式 / 複式 / 膽拖, 一注 ($10) / 半注 ($5). */
+/**
+ * HKJC Mark Six helpers: 單式 / 複式 / 膽拖.
+ * Unit stake $10; $5 partial unit (半注) is only for 複式 / 膽拖 — not 單式.
+ */
 
 export const MARK_SIX_MAX = 49
 export const MARK_SIX_PICK = 6
@@ -85,21 +88,22 @@ type Shape = {
 
 function enumerateAffordableShapes(remaining: number): Shape[] {
   const shapes: Shape[] = []
-  const units: UnitType[] = ['half', 'full']
 
+  // 單式 — full unit only ($10). HKJC does not offer 半注單式.
+  if (FULL_UNIT <= remaining) {
+    shapes.push({
+      kind: 'single',
+      unit: 'full',
+      selectCount: MARK_SIX_PICK,
+      combinations: 1,
+      stake: FULL_UNIT,
+    })
+  }
+
+  // 複式 / 膽拖 — may use 一注 ($10) or 半注 ($5).
+  const units: UnitType[] = ['half', 'full']
   for (const unit of units) {
     const price = unitPrice(unit)
-
-    // 單式 — always 1 combination
-    if (price <= remaining) {
-      shapes.push({
-        kind: 'single',
-        unit,
-        selectCount: MARK_SIX_PICK,
-        combinations: 1,
-        stake: price,
-      })
-    }
 
     // 複式 — pick 7..14 numbers (keep tickets readable)
     for (let n = 7; n <= 14; n += 1) {
@@ -119,13 +123,10 @@ function enumerateAffordableShapes(remaining: number): Shape[] {
     // 膽拖 — bankers 1..5, drags enough to form lines
     for (let b = 1; b <= 5; b += 1) {
       const needFromDrag = MARK_SIX_PICK - b
-      // drag at least needFromDrag; cap for readability
       const maxDrag = Math.min(14, MARK_SIX_MAX - b)
       for (let d = needFromDrag; d <= maxDrag; d += 1) {
-        // Skip pure-single equivalent that 膽拖 with d == need and looks odd? Keep all valid.
         const combos = combinations(d, needFromDrag)
         if (combos < 1) continue
-        // 膽拖 with exactly 1 combo is valid but identical cost to 單式 — still allowed.
         const stake = combos * price
         if (stake <= remaining) {
           shapes.push({
@@ -196,7 +197,7 @@ function materialize(shape: Shape): MarkSixBet {
 }
 
 /**
- * Randomly pack bets (any mix of 單式 / 複式 / 膽拖 × 一注 / 半注)
+ * Randomly pack bets (單式 at $10; 複式 / 膽拖 at $10 or $5)
  * so spent stake equals the largest multiple of $5 not exceeding totalAmount.
  */
 export function generateBets(totalAmount: number): {

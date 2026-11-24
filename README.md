@@ -32,7 +32,8 @@ Site URL (after the first successful deploy):
 | 單式 | Exactly 6 numbers → 1 combination |
 | 複式 | 7–14 numbers → C(n, 6) combinations |
 | 膽拖 | Bankers + drags → C(拖, 6−膽) combinations |
-| 一注 / 半注 | $10 or $5 per combination |
+| 一注 | $10 per combination (all types) |
+| 半注 | $5 per combination — **複式 / 膽拖 only** (not 單式) |
 
 Remaining dollars that are not a multiple of $5 are left unspent.
 
