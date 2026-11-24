@@ -28,6 +28,11 @@ jobs:
         run: |
           set -euo pipefail
           test -s package-lock.json
+          # Ensure we did not leave a spill/file placeholder behind
+          if head -c 1 package-lock.json | grep -q '\$'; then
+            echo "Refusing to commit placeholder lockfile" >&2
+            exit 1
+          fi
           node -e 'const j=require("./package-lock.json"); if(j.lockfileVersion!==3) throw new Error("bad lock"); console.log("packages", Object.keys(j.packages).length, "bytes", require("fs").statSync("package-lock.json").size)'
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
